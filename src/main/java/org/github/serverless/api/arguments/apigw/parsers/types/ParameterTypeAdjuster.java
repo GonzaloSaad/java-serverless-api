@@ -9,6 +9,8 @@ public abstract class ParameterTypeAdjuster {
         try {
             if (Integer.class.equals(parameter.getType())) {
                 return Integer.parseInt(argument);
+            } else if (Boolean.class.equals(parameter.getType())) {
+                return Boolean.parseBoolean(argument);
             }
             return argument;
         } catch (Exception e) {
