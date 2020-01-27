@@ -2,6 +2,8 @@ package org.github.serverless.api.handler.apigw;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.github.serverless.api.arguments.ArgumentExtractor;
 import org.github.serverless.api.arguments.apigw.ApiGatewayArgumentExtractor;
 import org.github.serverless.api.exceptions.apigw.APIException;
@@ -17,6 +19,9 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class ApiGatewayEventHandler extends EventHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+
+    private static Logger LOGGER = LogManager.getLogger(ApiGatewayEventHandler.class);
+
 
     private final ApiRouter apiRouter;
     private final OutputTransformer<APIGatewayProxyResponseEvent> outputTransformer;
@@ -53,8 +58,10 @@ public class ApiGatewayEventHandler extends EventHandler<APIGatewayProxyRequestE
                     .orElseGet(outputTransformer::transform);
 
         } catch (APIException e) {
+            LOGGER.warn(e);
             return outputTransformer.transform(e);
         } catch (Exception e) {
+            LOGGER.error(e);
             return outputTransformer.transform(e);
         }
 
