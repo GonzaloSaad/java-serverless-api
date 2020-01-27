@@ -6,6 +6,8 @@ import org.github.serverless.api.arguments.apigw.parsers.ApiGatewayEventParser;
 import org.github.serverless.api.arguments.apigw.parsers.BodyParameterParser;
 import org.github.serverless.api.arguments.apigw.parsers.PathParameterParser;
 import org.github.serverless.api.arguments.apigw.parsers.QueryParameterParser;
+import org.github.serverless.api.arguments.apigw.parsers.types.PathParameterAdjuster;
+import org.github.serverless.api.arguments.apigw.parsers.types.QueryParameterAdjuster;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -19,12 +21,16 @@ public class ApiGatewayArgumentExtractor implements ArgumentExtractor {
 
     public ApiGatewayArgumentExtractor(APIGatewayProxyRequestEvent event) {
         this.event = event;
-        this.eventParsers = Arrays.asList(
-                new PathParameterParser(),
-                new QueryParameterParser(),
+        this.eventParsers = createEventParser();
+
+    }
+
+    private List<ApiGatewayEventParser> createEventParser() {
+        return Arrays.asList(
+                new PathParameterParser(new PathParameterAdjuster()),
+                new QueryParameterParser(new QueryParameterAdjuster()),
                 new BodyParameterParser()
         );
-
     }
 
     @Override

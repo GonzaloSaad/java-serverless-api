@@ -2,11 +2,19 @@ package org.github.serverless.api.arguments.apigw.parsers;
 
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import org.github.serverless.api.annotations.parameters.PathParameter;
+import org.github.serverless.api.arguments.apigw.parsers.types.ParameterTypeAdjuster;
+import org.github.serverless.api.exceptions.parsing.path.PathParameterMissingException;
 
 import java.lang.reflect.Parameter;
 import java.util.Map;
 
 public class PathParameterParser implements ApiGatewayEventParser {
+
+    private final ParameterTypeAdjuster adjuster;
+
+    public PathParameterParser(ParameterTypeAdjuster adjuster) {
+        this.adjuster = adjuster;
+    }
 
     @Override
     public boolean isParameter(Parameter parameter) {
@@ -18,21 +26,16 @@ public class PathParameterParser implements ApiGatewayEventParser {
 
         Map<String, String> pathParameters = event.getPathParameters();
 
-        if (pathParameters != null && !pathParameters.isEmpty()) {
-            PathParameter pathParameter = parameter.getAnnotation(PathParameter.class);
-            String pathParameterName = pathParameter.name();
-            String argument = pathParameters.get(pathParameterName);
+        PathParameter pathParameter = parameter.getAnnotation(PathParameter.class);
+        String pathParameterName = pathParameter.name();
 
-            return adjustReturnType(parameter, argument);
+        if (pathParameters != null && !pathParameters.isEmpty() && pathParameters.containsKey(pathParameterName)) {
+            String pathParameterValue = pathParameters.get(pathParameterName);
+            return adjuster.adjust(parameter, pathParameterValue);
+        } else if (pathParameter.required()) {
+            throw new PathParameterMissingException(pathParameterName);
+        } else {
+            return null;
         }
-        return null;
     }
-
-    private Object adjustReturnType(Parameter parameter, String argument) {
-        if (Integer.class.equals(parameter.getType())) {
-            return Integer.parseInt(argument);
-        }
-        return argument;
-    }
-
 }
