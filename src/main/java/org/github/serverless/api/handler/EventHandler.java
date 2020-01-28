@@ -25,7 +25,7 @@ public abstract class EventHandler<I, O> {
 
     protected abstract I transform(String eventString) throws IOException;
 
-    protected abstract O digest(I input) throws IOException;
+    protected abstract O digest(I input);
 
     public void setNextEventHandler(EventHandler<?, ?> nextEventHandler) {
         this.nextEventHandler = nextEventHandler;
