@@ -15,8 +15,12 @@ public class EndpointDispatcher {
         this.method = method;
     }
 
-    public Object dispatch(ArgumentExtractor argumentExtractor) throws InvocationTargetException, IllegalAccessException {
+    public Object dispatch(ArgumentExtractor argumentExtractor) throws Throwable {
         Object[] arguments = argumentExtractor.extract(method);
-        return method.invoke(controller, arguments);
+        try {
+            return method.invoke(controller, arguments);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw e.getCause();
+        }
     }
 }
