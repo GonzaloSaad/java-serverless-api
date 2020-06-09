@@ -71,7 +71,7 @@ public class ApiGatewayEventHandler extends EventHandler<APIGatewayProxyRequestE
         } catch (APIException e) {
             LOGGER.warn("APIException occurred", e);
             return outputTransformer.transform(e);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOGGER.error("Exception occurred", e);
             return outputTransformer.transform(e);
         }
