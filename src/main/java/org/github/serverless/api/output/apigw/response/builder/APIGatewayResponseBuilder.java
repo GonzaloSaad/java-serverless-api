@@ -30,6 +30,8 @@ public class APIGatewayResponseBuilder implements ResponseBuilder<APIGatewayProx
 
     @Override
     public APIGatewayProxyResponseEvent build() {
+        // Add Cors by default - yes! A horrible patch
+        headers.put("Access-Control-Allow-Origin", "*");
         APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
         responseEvent.setStatusCode(statusCode);
         responseEvent.setBody(body);
